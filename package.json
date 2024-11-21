@@ -1,0 +1,22 @@
+{
+  "name": "p5js",
+  "version": "1.0.0",
+  "description": "A collection of p5js creations.",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "webpack --watch"
+  },
+  "author": "Luan Martins",
+  "license": "MIT",
+  "dependencies": {
+    "@types/p5": "^1.7.6",
+    "p5": "^1.11.1",
+    "ts-loader": "^9.5.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
+  }
+}
