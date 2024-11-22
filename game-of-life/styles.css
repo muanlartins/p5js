@@ -17,7 +17,7 @@ canvas {
   align-content: center;
 }
 
-#snake-game {
+#game-of-life {
   display: flex;
   justify-content: center;
   align-items: center;

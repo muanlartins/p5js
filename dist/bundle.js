@@ -12,6 +12,224 @@
 
 /***/ }),
 
+/***/ "./game-of-life/board.ts":
+/*!*******************************!*\
+  !*** ./game-of-life/board.ts ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Board: () => (/* binding */ Board)
+/* harmony export */ });
+/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cell */ "./game-of-life/cell.ts");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constants */ "./game-of-life/constants.ts");
+
+
+class Board {
+    constructor(p5) {
+        this.p5 = p5;
+        this.setupInitialBoard();
+    }
+    update() {
+        let nextCells = [];
+        for (let row = 0; row < _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT; row++) {
+            const nextCellsRow = [];
+            for (let column = 0; column < _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT; column++) {
+                const currentCell = this.cells[row][column];
+                const nextCell = this.generateNextCell(currentCell);
+                nextCellsRow.push(nextCell);
+            }
+            nextCells.push(nextCellsRow);
+        }
+        this.cells = nextCells;
+    }
+    getAliveNeighborsCount(cell) {
+        const row = cell.row;
+        const column = cell.column;
+        const previousRow = (row - 1 + _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT) % _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT;
+        const nextRow = (row + 1 + _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT) % _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT;
+        const previousColumn = (column - 1 + _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT) % _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT;
+        const nextColumn = (column + 1 + _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT) % _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT;
+        let aliveNeighborsCount = 0;
+        aliveNeighborsCount += (this.cells[previousRow][column].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[nextRow][column].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[row][previousColumn].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[row][nextColumn].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[previousRow][previousColumn].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[previousRow][nextColumn].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[nextRow][previousColumn].isAlive ? 1 : 0);
+        aliveNeighborsCount += (this.cells[nextRow][nextColumn].isAlive ? 1 : 0);
+        return aliveNeighborsCount;
+    }
+    generateNextCell(currentCell) {
+        const nextCell = new _cell__WEBPACK_IMPORTED_MODULE_0__.Cell(this.p5, currentCell.row, currentCell.column);
+        const currentCellAliveNeighborsCount = this.getAliveNeighborsCount(currentCell);
+        nextCell.setAliveNeighborsCount(currentCellAliveNeighborsCount);
+        nextCell.isAlive = this.isNextCellAlive(currentCell);
+        return nextCell;
+    }
+    isNextCellAlive(cell) {
+        if (cell.isAlive &&
+            (cell.aliveNeighborsCount < 2 || cell.aliveNeighborsCount > 3)) {
+            cell.die();
+        }
+        else if (!cell.isAlive && cell.aliveNeighborsCount == 3) {
+            cell.live();
+        }
+        return cell.isAlive;
+    }
+    show() {
+        for (let row = 0; row < _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT; row++) {
+            for (let column = 0; column < _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT; column++) {
+                this.cells[row][column].show();
+            }
+        }
+    }
+    setupInitialBoard() {
+        this.cells = [];
+        for (let row = 0; row < _constants__WEBPACK_IMPORTED_MODULE_1__.ROW_TILE_COUNT; row++) {
+            const cellsRow = [];
+            for (let column = 0; column < _constants__WEBPACK_IMPORTED_MODULE_1__.COLUMN_TILE_COUNT; column++) {
+                const cell = new _cell__WEBPACK_IMPORTED_MODULE_0__.Cell(this.p5, row, column);
+                cellsRow.push(cell);
+            }
+            this.cells.push(cellsRow);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./game-of-life/cell.ts":
+/*!******************************!*\
+  !*** ./game-of-life/cell.ts ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Cell: () => (/* binding */ Cell)
+/* harmony export */ });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./game-of-life/constants.ts");
+
+class Cell {
+    constructor(p5, row, column) {
+        this.p5 = p5;
+        this.isAlive = p5.random([false, true]);
+        this.row = row;
+        this.column = column;
+        const coordinates = this.getCoordinates(row, column);
+        this.x = coordinates.x;
+        this.y = coordinates.y;
+        this.aliveNeighborsCount = 0;
+    }
+    setAliveNeighborsCount(aliveNeighborsCount) {
+        this.aliveNeighborsCount = aliveNeighborsCount;
+    }
+    getCoordinates(row, column) {
+        return {
+            x: row * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE,
+            y: column * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE
+        };
+    }
+    show() {
+        if (this.isAlive) {
+            this.p5.fill(15);
+        }
+        else {
+            this.p5.fill(240);
+        }
+        this.p5.strokeWeight(0);
+        this.p5.rect(this.x, this.y, _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE, _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE);
+    }
+    showAliveNeighborsCounter() {
+        if (this.isAlive) {
+            this.p5.fill(240);
+        }
+        else {
+            this.p5.fill(15);
+        }
+        this.p5.textSize(14);
+        this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
+        this.p5.text(this.aliveNeighborsCount, this.x + _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE / 2, this.y + _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE / 2);
+    }
+    live() {
+        this.isAlive = true;
+    }
+    die() {
+        this.isAlive = false;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./game-of-life/constants.ts":
+/*!***********************************!*\
+  !*** ./game-of-life/constants.ts ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   COLUMN_TILE_COUNT: () => (/* binding */ COLUMN_TILE_COUNT),
+/* harmony export */   FRAME_RATE: () => (/* binding */ FRAME_RATE),
+/* harmony export */   HEIGHT: () => (/* binding */ HEIGHT),
+/* harmony export */   LAST_COLUMN_TILE: () => (/* binding */ LAST_COLUMN_TILE),
+/* harmony export */   LAST_ROW_TILE: () => (/* binding */ LAST_ROW_TILE),
+/* harmony export */   ROW_TILE_COUNT: () => (/* binding */ ROW_TILE_COUNT),
+/* harmony export */   TILE_SIZE: () => (/* binding */ TILE_SIZE),
+/* harmony export */   WIDTH: () => (/* binding */ WIDTH)
+/* harmony export */ });
+const WIDTH = 800;
+const HEIGHT = 600;
+const FRAME_RATE = 15;
+const TILE_SIZE = 20;
+const ROW_TILE_COUNT = WIDTH / TILE_SIZE;
+const COLUMN_TILE_COUNT = HEIGHT / TILE_SIZE;
+const LAST_ROW_TILE = (ROW_TILE_COUNT - 1) * TILE_SIZE;
+const LAST_COLUMN_TILE = (ROW_TILE_COUNT - 1) * TILE_SIZE;
+
+
+/***/ }),
+
+/***/ "./game-of-life/sketch.ts":
+/*!********************************!*\
+  !*** ./game-of-life/sketch.ts ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   gameOfLifeSketch: () => (/* binding */ gameOfLifeSketch)
+/* harmony export */ });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./game-of-life/constants.ts");
+/* harmony import */ var _board__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./board */ "./game-of-life/board.ts");
+
+
+const gameOfLifeSketch = function (p5) {
+    let board;
+    p5.setup = () => {
+        p5.createCanvas(_constants__WEBPACK_IMPORTED_MODULE_0__.WIDTH, _constants__WEBPACK_IMPORTED_MODULE_0__.HEIGHT);
+        p5.frameRate(_constants__WEBPACK_IMPORTED_MODULE_0__.FRAME_RATE);
+        board = new _board__WEBPACK_IMPORTED_MODULE_1__.Board(p5);
+    };
+    p5.draw = () => {
+        p5.background(240);
+        board.update();
+        board.show();
+    };
+};
+
+
+/***/ }),
+
 /***/ "./snake-game/constants.ts":
 /*!*********************************!*\
   !*** ./snake-game/constants.ts ***!
@@ -458,10 +676,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var p5__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! p5 */ "./node_modules/p5/lib/p5.min.js");
 /* harmony import */ var p5__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(p5__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _snake_game_sketch__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./snake-game/sketch */ "./snake-game/sketch.ts");
+/* harmony import */ var _game_of_life_sketch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./game-of-life/sketch */ "./game-of-life/sketch.ts");
 
 
-const parent = document.getElementById('canvas');
-new p5__WEBPACK_IMPORTED_MODULE_0__(_snake_game_sketch__WEBPACK_IMPORTED_MODULE_1__.snakeGameSketch, parent);
+
+const snakeGameDiv = document.getElementById('snake-game');
+new p5__WEBPACK_IMPORTED_MODULE_0__(_snake_game_sketch__WEBPACK_IMPORTED_MODULE_1__.snakeGameSketch, snakeGameDiv);
+const gameOfLifeDiv = document.getElementById('game-of-life');
+new p5__WEBPACK_IMPORTED_MODULE_0__(_game_of_life_sketch__WEBPACK_IMPORTED_MODULE_2__.gameOfLifeSketch, gameOfLifeDiv);
 
 })();
 
