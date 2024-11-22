@@ -681,9 +681,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const snakeGameDiv = document.getElementById('snake-game');
-new p5__WEBPACK_IMPORTED_MODULE_0__(_snake_game_sketch__WEBPACK_IMPORTED_MODULE_1__.snakeGameSketch, snakeGameDiv);
+if (snakeGameDiv)
+    new p5__WEBPACK_IMPORTED_MODULE_0__(_snake_game_sketch__WEBPACK_IMPORTED_MODULE_1__.snakeGameSketch, snakeGameDiv);
 const gameOfLifeDiv = document.getElementById('game-of-life');
-new p5__WEBPACK_IMPORTED_MODULE_0__(_game_of_life_sketch__WEBPACK_IMPORTED_MODULE_2__.gameOfLifeSketch, gameOfLifeDiv);
+if (gameOfLifeDiv)
+    new p5__WEBPACK_IMPORTED_MODULE_0__(_game_of_life_sketch__WEBPACK_IMPORTED_MODULE_2__.gameOfLifeSketch, gameOfLifeDiv);
 
 })();
 
